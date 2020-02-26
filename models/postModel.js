@@ -12,10 +12,6 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
     published: {
         type: Boolean,
         Default: true
@@ -36,7 +32,7 @@ const postSchema = new mongoose.Schema({
             ref: 'Comment'
         }
     ]
-});
+}, {timestamps: true});
 
 const Post = mongoose.model('Post', postSchema);
 

@@ -1,4 +1,5 @@
 const Post = require('../models/postModel');
+const AppError = require('../config/appError');
 
 module.exports = {
     get_Posts: (req, res, next)=>{
@@ -12,20 +13,29 @@ module.exports = {
         }).catch(next)
     },
 
-    get_single_Post: (req, res, next)=>{
-        let post_id = req.params.id;
-        Post.findById(post_id).populate('comments').then(post=>{
-            if(!post) {
-                res.status(404).json({
-                    message: 'No post found with that ID'
-                })
-            }
+    get_recent_posts: (req, res, next)=>{
+        Post.find({}).sort({createdAt: 1}).then(items=>{
             res.status(200).json({
                 status: 'success',
-                data: {
-                    post
-                }
+                data: {items}
             })
+        }).catch(next)
+    },
+
+    get_single_Post: (req, res, next)=>{
+        let post_id = req.params.id;
+        Post.findById(post_id).populate('comments').populate('tags').then(post=>{
+            if(!post) {
+                next(new AppError('The post with requested ID does not exist', 404))
+            } else {
+                res.status(200).json({
+                    status: 'success',
+                    data: {
+                        post
+                    }
+                })
+            }
+            
         }).catch(next)
     },
 
@@ -43,14 +53,12 @@ module.exports = {
         let update = req.body;
         Post.findByIdAndUpdate(req.params.id, update).then(post=>{
             if(!post){
-                res.status(404).json({
-                    message: 'No post found with that ID'
+                next(new AppError('The post with requested ID does not exist', 404))
+            } else {
+                res.status(204).json({
+                    status: 'successful',
                 })
             }
-            res.status(204).json({
-                status: 'successful',
-                message: 'Post successfully updated'
-            })
         })
     },
 
@@ -58,14 +66,13 @@ module.exports = {
         let post_id = req.params.id;
         Post.findByIdAndDelete(post_id).then(post=>{
             if(!post) {
-                res.status(404).json({
-                    message: 'No post found with that ID'
+                next(new AppError('The post with requested ID does not exist', 404))
+            } else {
+                res.status(204).json({
+                    status: 'success',
                 })
             }
-            res.status(204).json({
-                status: 'success',
-                message: 'Post Deleted'
-            })
+            
         }).catch(next)
     }
 }
