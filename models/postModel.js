@@ -3,18 +3,18 @@ const mongoose = require('mongoose');
 const postSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true
+        required: [true, 'Please enter a post title']
     },
     image: {
         type: String
     },
     content: {
         type: String,
-        required: true
+        required: [true, 'Please enter post content']
     },
     published: {
         type: Boolean,
-        Default: true
+        default: true
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,

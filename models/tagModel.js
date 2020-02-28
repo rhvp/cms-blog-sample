@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const tagSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true
+        required: [true, 'Please enter tag title']
     },
     posts: [
         {

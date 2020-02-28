@@ -1,6 +1,7 @@
 const express = require('express');
 const post_Controller = require('../controllers/postController');
 const comment_Controller = require('../controllers/commentController');
+const tag_controller = require('../controllers/tagsController');
 const router = express.Router();
 
 router.route('/')
@@ -9,7 +10,6 @@ router.route('/')
 
 router.route('/:id')
     .get(post_Controller.get_single_Post)
-    .post(post_Controller.update_Post)
     .put(post_Controller.update_Post)
     .delete(post_Controller.delete_Post)
     
@@ -19,6 +19,9 @@ router.route('/recentPosts')
 router.route('/comments/:post_id')
     .post(comment_Controller.post_new_comment)
     .delete(comment_Controller.delete_comment)
+
+router.route('/tags/:post_id')
+    .post(tag_controller.add_post_tag)
 
 
 module.exports = router;

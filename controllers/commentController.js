@@ -6,7 +6,6 @@ module.exports = {
         let post_id = req.params.post_id;
         let comment = req.body;
         try {
-
             let post = await Post.findById(post_id);
             let new_comment = await Comment.create(comment);
             let new_comment_id = new_comment._id;
@@ -34,7 +33,7 @@ module.exports = {
         try {
             let comment_id = req.body.comment_id;
             await Comment.findByIdAndDelete(comment_id);
-            await Post.update(
+            await Post.updateOne(
                 {"_id": req.params.id}, {"$pull": {"comments": comment_id}}
             );
             

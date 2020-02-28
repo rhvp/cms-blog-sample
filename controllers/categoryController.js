@@ -16,6 +16,6 @@ module.exports = {
                 status: 'success',
                 data: {items}
             })
-        })
+        }).catch(next)
     }
 }
