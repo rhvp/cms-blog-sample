@@ -14,5 +14,5 @@ app.listen(port, ()=>{
 });
 
 process.on('unhandledRejection', err=>{
-    console.log('Unhandled Rejection!! Process shutting down...', err.name, err.message, err.stack);
+    console.log('Unhandled Rejection!!', err.name, err.message, err.stack);
 })

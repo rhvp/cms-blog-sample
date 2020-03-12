@@ -81,7 +81,7 @@ module.exports = {
             await comments.map(item=>{
                 return Comment.findByIdAndDelete(item).then(id=>{
                     console.log('Comment successfully deleted from post');
-                })
+                }).catch(next)
             });
 
             // Delete post from referenced tags
@@ -89,7 +89,7 @@ module.exports = {
             await tags.map(item=>{
                 return Tag.updateOne({'_id': item}, {'$pull': {'posts': req.params.id}}).then(()=>{
                     console.log('post deleted from tag')
-                })
+                }).catch(next)
             })
 
             // Finally Delete post

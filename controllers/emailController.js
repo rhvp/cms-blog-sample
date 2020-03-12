@@ -16,7 +16,7 @@ exports.sendMail = async (req, res, next) => {
             message: 'Email Sent!!'
         })
     } catch(err){
-        console.log(err);
+        console.error(err);
 
         return next(new AppError('There was an error sending the mail', 500))
     }

@@ -33,6 +33,8 @@ module.exports = {
         try {
             let comment_id = req.body.comment_id;
             await Comment.findByIdAndDelete(comment_id);
+
+            // Remove comment reference from post
             await Post.updateOne(
                 {"_id": req.params.id}, {"$pull": {"comments": comment_id}}
             );
