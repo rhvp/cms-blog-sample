@@ -8,6 +8,9 @@ const postSchema = new mongoose.Schema({
     image: {
         type: String
     },
+    excerpt: {
+        type: String
+    },
     content: {
         type: String,
         required: [true, 'Please enter post content']
@@ -16,10 +19,12 @@ const postSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category'
-    },
+    category: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Category'
+        }
+    ],
     tags: [
         {
             type: mongoose.Schema.Types.ObjectId,

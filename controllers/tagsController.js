@@ -2,28 +2,15 @@ const Tag = require('../models/tagModel');
 const Post = require('../models/postModel');
 const AppError = require('../config/appError');
 const mongoose = require('mongoose');
+const _ = require('underscore');
 
 module.exports = {
     get_all_tags: (req, res, next)=> {
         Tag.find({}).then(items=>{
             res.status(200).json({
                 status: 'success',
-                data: {items}
+                data: items
             })
-        }).catch(next)
-    },
-
-    get_single_tag: async (req, res, next)=>{
-        Tag.findById(req.params.id).populate('posts').then(item=>{
-            if(!item){
-                return next(new AppError('The requested tag with provided ID does not exist', 404))
-            } 
-                res.status(200).json({
-                    status: 'success',
-                    data: {item}
-                })
-            
-           
         }).catch(next)
     },
 
@@ -60,10 +47,11 @@ module.exports = {
     },
 
     create_new_tag: (req, res, next)=>{
-        Tag.create(req.body).then(item=>{
+        let tag = _.pick(req.body, ['title']);
+        Tag.create(tag).then(item=>{
             res.status(201).json({
                 status: 'success',
-                data: {item}
+                data: item
             })
         }).catch(next)
     }

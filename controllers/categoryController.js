@@ -1,11 +1,14 @@
 const Category = require('../models/categoryModel');
+const _ = require('underscore');
 
 module.exports = {
     add_new_category: (req, res, next) => {
-        Category.create(req.body).then(item=>{
+        let category = _.pick(req.body, ['title']);
+        Category.create(category).then(item=>{
             res.status(201).json({
                 status: 'success',
-                message: 'Category Successfully Added'
+                message: 'Category Successfully Added',
+                data: item
             })
         }).catch(next)
     },

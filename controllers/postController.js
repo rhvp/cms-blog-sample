@@ -1,11 +1,34 @@
 const Post = require('../models/postModel');
 const Tag = require('../models/tagModel');
+const Category = require('../models/categoryModel')
 const Comment = require('../models/commentsModel');
 const AppError = require('../config/appError');
+const _ = require('underscore');
+const mongoose = require('mongoose');
 
 module.exports = {
     get_Posts: (req, res, next)=>{
-        Post.find({'published':true}).then(posts=>{
+        Post.find({}).then(posts=>{
+            res.status(200).json({
+                status: 'success',
+                data: {
+                    posts
+                }
+            })
+        }).catch(next)
+    },
+
+    get_Published:(req, res, next)=>{
+        Post.find({'published': true}).then(posts=>{
+            res.status(200).json({
+                status: 'success',
+                data: posts
+            })
+        })
+    },
+
+    get_Drafts:(req, res, next)=>{
+        Post.find({'published':false}).then(posts=>{
             res.status(200).json({
                 status: 'success',
                 data: {
@@ -41,32 +64,64 @@ module.exports = {
         }).catch(next)
     },
 
-    create_Post: (req, res, next)=>{
-        
-        let new_post = req.body;
-        Post.create(new_post).then(post=>{
-            res.status(201).json({
+    get_Posts_By_Category: (req, res, next)=>{
+        const cat_id = req.params.id;
+        Post.find({'category':cat_id}).then(posts=>{
+            res.status(200).json({
                 status: 'success',
-                message: 'New Post Created',
-                data: {
-                    post
-                }
+                data: posts
             })
         }).catch(next)
     },
 
+    create_Post: async(req, res, next)=>{
+        try {
+            let expected_body = _.pick(req.body,['title', 'content', 'image', 'excerpt']);
+            const post = new Post(expected_body);
+            
+            await req.body.categories.map(category=>{
+                let cat_id = mongoose.Types.ObjectId(category)
+                post.category.push(cat_id);
+            });
+            await req.body.tags.map(tag=>{
+                let tag_id = mongoose.Types.ObjectId(tag);
+                post.tags.push(tag_id)
+                // let post_id = mongoose.Types.ObjectId(post._id)
+                // Tag.updateOne({'_id': tag}, {'$push': {'posts': post_id}}).then((tag)=>{
+                //     console.log('tag updated');
+                // }).catch(next)
+            });
+            if(!req.body.publish) post.published = false;
+            post.save(err=>{
+                if(err) return next(err);
+                res.status(201).json({
+                    status: 'success',
+                    message: 'Post created successfully',
+                    data: post
+                })
+            })
+            
+        } catch (error) {
+            next(error)
+        }
+        
+    },
+
     update_Post: (req, res, next)=>{
-        let update = req.body;
+        let update = _.pick(req.body, 'title','content', 'image', 'excerpt');
+        if(req.body.publish) update.published = true;
         Post.findByIdAndUpdate(req.params.id, update).then(post=>{
             if(!post){
                 return next(new AppError('The post with requested ID does not exist', 404))
             } 
                 res.status(204).json({
                     status: 'success',
+                    message: 'Post successfully updated'
                 })
             
         }).catch(next)
     },
+
 
     delete_Post: async (req, res, next)=>{
         try {
@@ -87,7 +142,7 @@ module.exports = {
             // Delete post from referenced tags
             let tags = post.tags;
             await tags.map(item=>{
-                return Tag.updateOne({'_id': item}, {'$pull': {'posts': req.params.id}}).then(()=>{
+                 Tag.updateOne({'_id': item}, {'$pull': {'posts': req.params.id}}).then(()=>{
                     console.log('post deleted from tag')
                 }).catch(next)
             })
