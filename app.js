@@ -1,6 +1,10 @@
 const express = require('express');
-const app = express();
+const cors = require('cors');
 const AppError = require('./config/appError');
+const app = express();
+
+app.use(cors());
+app.options('*', cors());
 app.use(express.json());
 
 const post_Routes = require('./routes/postRoutes');
