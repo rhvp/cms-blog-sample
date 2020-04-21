@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 
 module.exports = {
     get_Posts: (req, res, next)=>{
-        Post.find({}).then(posts=>{
+        Post.find({}).populate('tags category comments').then(posts=>{
             res.status(200).json({
                 status: 'success',
                 data: {
@@ -19,7 +19,7 @@ module.exports = {
     },
 
     get_Published:(req, res, next)=>{
-        Post.find({'published': true}).then(posts=>{
+        Post.find({'published': true}).populate('tags category comments').then(posts=>{
             res.status(200).json({
                 status: 'success',
                 data: {posts}
@@ -28,7 +28,7 @@ module.exports = {
     },
 
     get_Drafts:(req, res, next)=>{
-        Post.find({'published':false}).then(posts=>{
+        Post.find({'published':false}).populate('tags category comments').then(posts=>{
             res.status(200).json({
                 status: 'success',
                 data: {
@@ -39,7 +39,7 @@ module.exports = {
     },
 
     get_recent_posts: (req, res, next)=>{
-        Post.find({}).sort({createdAt: -1}).then(posts=>{
+        Post.find({}).sort({createdAt: -1}).populate('tags category comments').then(posts=>{
             res.status(200).json({
                 status: 'success',
                 data: {posts}
@@ -49,7 +49,7 @@ module.exports = {
 
     get_single_Post: (req, res, next)=>{
         let post_id = req.params.id;
-        Post.findById(post_id).populate('comments').populate('tags').then(post=>{
+        Post.findById(post_id).populate('comments').populate('tags').populate('category').then(post=>{
             if(!post) {
                 return next(new AppError('The post with requested ID does not exist', 404))
             } 
@@ -66,7 +66,7 @@ module.exports = {
 
     get_Posts_By_Category: (req, res, next)=>{
         const cat_id = req.params.id;
-        Post.find({'category':cat_id}).then(posts=>{
+        Post.find({'category':cat_id}).populate('tags category comments').then(posts=>{
             res.status(200).json({
                 status: 'success',
                 data: {posts}
