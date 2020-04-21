@@ -48,10 +48,11 @@ module.exports = {
 
     create_new_tag: (req, res, next)=>{
         let tag = _.pick(req.body, ['title']);
-        Tag.create(tag).then(item=>{
+        Tag.create(tag).then(async item=>{
+            const tags = await Tag.find({});
             res.status(201).json({
                 status: 'success',
-                data: item
+                data: {tags}
             })
         }).catch(next)
     }

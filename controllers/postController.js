@@ -22,7 +22,7 @@ module.exports = {
         Post.find({'published': true}).then(posts=>{
             res.status(200).json({
                 status: 'success',
-                data: posts
+                data: {posts}
             })
         })
     },
@@ -39,10 +39,10 @@ module.exports = {
     },
 
     get_recent_posts: (req, res, next)=>{
-        Post.find({}).sort({createdAt: -1}).then(items=>{
+        Post.find({}).sort({createdAt: -1}).then(posts=>{
             res.status(200).json({
                 status: 'success',
-                data: {items}
+                data: {posts}
             })
         }).catch(next)
     },
@@ -69,7 +69,7 @@ module.exports = {
         Post.find({'category':cat_id}).then(posts=>{
             res.status(200).json({
                 status: 'success',
-                data: posts
+                data: {posts}
             })
         }).catch(next)
     },
@@ -97,7 +97,7 @@ module.exports = {
                 res.status(201).json({
                     status: 'success',
                     message: 'Post created successfully',
-                    data: post
+                    data: {post}
                 })
             })
             

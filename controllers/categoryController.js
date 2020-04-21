@@ -4,11 +4,11 @@ const _ = require('underscore');
 module.exports = {
     add_new_category: (req, res, next) => {
         let category = _.pick(req.body, ['title']);
-        Category.create(category).then(item=>{
+        Category.create(category).then(async item=>{
+            const categories = await Category.find({});
             res.status(201).json({
                 status: 'success',
-                message: 'Category Successfully Added',
-                data: item
+                data: {categories}
             })
         }).catch(next)
     },
