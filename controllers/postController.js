@@ -1,6 +1,5 @@
 const Post = require('../models/postModel');
 const Tag = require('../models/tagModel');
-const Category = require('../models/categoryModel')
 const Comment = require('../models/commentsModel');
 const AppError = require('../config/appError');
 const _ = require('underscore');
@@ -107,21 +106,31 @@ module.exports = {
         
     },
 
-    update_Post: (req, res, next)=>{
-        let update = _.pick(req.body, 'title','content', 'image', 'excerpt');
-        if(req.body.publish) update.published = true;
-        Post.findByIdAndUpdate(req.params.id, update).then(post=>{
-            if(!post){
-                return next(new AppError('The post with requested ID does not exist', 404))
-            } 
-                res.status(204).json({
-                    status: 'success',
-                    message: 'Post successfully updated'
-                })
-            
-        }).catch(next)
-    },
+    update_Post: async(req, res, next)=>{
 
+        try {
+            let update = _.pick(req.body, 'title','content', 'image', 'excerpt', 'tags', 'category');
+            const post = await Post.findById(req.params.id);
+            if(!post) return next(new AppError('Post Not Found', 404));
+            await update.tags.map(tag=>{
+                let id = mongoose.Types.ObjectId(tag);
+                post.tags.push(id);
+            })
+            await update.category.map(category=>{
+                let id = mongoose.Types.ObjectId(category);
+                post.category.push(id);
+            })
+            post.save(err=>{
+                if(err) return next(err);
+                res.json({
+                    data: {post}
+                })
+            })
+        } catch (error) {
+            next(error)
+        }
+        
+    },
 
     delete_Post: async (req, res, next)=>{
         try {
@@ -156,5 +165,33 @@ module.exports = {
         } catch(err) {
                 next(err)
             }
+        },
+
+        publish_Post: async(req, res, next)=>{
+            const post = await Post.findById(req.params.id);
+            if(!post) return next(new AppError('Post not found', 404));
+            if(post.published) return next(new AppError('Post has already been published', 403));
+            post.published = true;
+            post.save(err=>{
+                if(err) return next(err);
+                res.status(200).json({
+                    status: 'success',
+                    message: 'Post published'
+                })
+            })
+        },
+
+        unpublish_Post:async(req, res, next)=>{
+            const post = await Post.findById(req.params.id);
+            if(!post) return next(new AppError('Post not found', 404));
+            post.published = false;
+            post.save(err=>{
+                if(err) return next(err);
+                res.status(200).json({
+                    status: 'success',
+                    message: 'Post saved as draft'
+                    
+                })
+            })
         }
 }
