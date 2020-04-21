@@ -1,6 +1,7 @@
 const Comment =  require('../models/commentsModel');
 const Post = require('../models/postModel');
 const AppError = require('../config/appError');
+const mongoose = require('mongoose');
 module.exports = {
     post_new_comment: async (req, res, next)=>{
         let post_id = req.params.post_id;
@@ -8,7 +9,7 @@ module.exports = {
         try {
             let post = await Post.findById(post_id);
             let new_comment = await Comment.create(comment);
-            let new_comment_id = new_comment._id;
+            let new_comment_id = mongoose.Types.ObjectId(new_comment._id);
             if(new_comment_id) {
                 post.comments.push(new_comment_id);
                 post.save(err=>{

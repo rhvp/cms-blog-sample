@@ -14,10 +14,10 @@ module.exports = {
     },
 
     get_all_categories: (req, res, next)=>{
-        Category.find({}).then(items=>{
+        Category.find({}).then(categories=>{
             res.status(200).json({
                 status: 'success',
-                data: {items}
+                data: {categories}
             })
         }).catch(next)
     }

@@ -6,10 +6,10 @@ const _ = require('underscore');
 
 module.exports = {
     get_all_tags: (req, res, next)=> {
-        Tag.find({}).then(items=>{
+        Tag.find({}).then(tags=>{
             res.status(200).json({
                 status: 'success',
-                data: items
+                data: {tags}
             })
         }).catch(next)
     },
