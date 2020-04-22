@@ -10,11 +10,13 @@ app.use(express.json());
 const post_Routes = require('./routes/postRoutes');
 const category_Routes = require('./routes/categoryRoutes');
 const tag_Routes = require('./routes/tagRoutes');
+const user_Routes = require('./routes/userRoutes');
 
 
 app.use('/api/posts', post_Routes);
 app.use('/api/categories', category_Routes);
 app.use('/api/tags', tag_Routes);
+app.use('/api/user', user_Routes);
 
 
 app.use((req, res, next)=>{

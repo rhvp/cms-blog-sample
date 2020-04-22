@@ -22,23 +22,27 @@ const postSchema = new mongoose.Schema({
     category: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Category'
+            ref: 'category'
         }
     ],
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    },
     tags: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Tag'
+            ref: 'tag'
         }
     ],
     comments: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Comment'
+            ref: 'comment'
         }
     ]
 }, {timestamps: true});
 
-const Post = mongoose.model('Post', postSchema);
+const Post = mongoose.model('post', postSchema);
 
 module.exports = Post;

@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 
 module.exports = {
     get_Posts: (req, res, next)=>{
-        Post.find({}).populate('tags category comments').then(posts=>{
+        Post.find({}).populate('tags category comments author').then(posts=>{
             res.status(200).json({
                 status: 'success',
                 data: {
@@ -18,7 +18,7 @@ module.exports = {
     },
 
     get_Published:(req, res, next)=>{
-        Post.find({'published': true}).populate('tags category comments').then(posts=>{
+        Post.find({'published': true}).populate('tags category comments author').then(posts=>{
             res.status(200).json({
                 status: 'success',
                 data: {posts}
@@ -77,7 +77,8 @@ module.exports = {
         try {
             let expected_body = _.pick(req.body,['title', 'content', 'image', 'excerpt']);
             const post = new Post(expected_body);
-            
+            const authorId = mongoose.Types.ObjectId(req.params.user_id);
+            post.author = authorId;
             await req.body.categories.map(category=>{
                 let cat_id = mongoose.Types.ObjectId(category)
                 post.category.push(cat_id);
@@ -85,10 +86,6 @@ module.exports = {
             await req.body.tags.map(tag=>{
                 let tag_id = mongoose.Types.ObjectId(tag);
                 post.tags.push(tag_id)
-                // let post_id = mongoose.Types.ObjectId(post._id)
-                // Tag.updateOne({'_id': tag}, {'$push': {'posts': post_id}}).then((tag)=>{
-                //     console.log('tag updated');
-                // }).catch(next)
             });
             if(!req.body.publish) post.published = false;
             post.save(err=>{
@@ -109,22 +106,24 @@ module.exports = {
     update_Post: async(req, res, next)=>{
 
         try {
-            let update = _.pick(req.body, 'title','content', 'image', 'excerpt', 'tags', 'category');
+            let update = _.pick(req.body, 'title','content', 'image', 'excerpt');
             const post = await Post.findById(req.params.id);
             if(!post) return next(new AppError('Post Not Found', 404));
-            await update.tags.map(tag=>{
+            await req.body.tags.map(tag=>{
                 let id = mongoose.Types.ObjectId(tag);
                 post.tags.push(id);
             })
-            await update.category.map(category=>{
+            await req.body.category.map(category=>{
                 let id = mongoose.Types.ObjectId(category);
                 post.category.push(id);
             })
+           
             post.save(err=>{
                 if(err) return next(err);
-                res.json({
-                    data: {post}
-                })
+            })
+            await Post.updateOne({_id: req.params.id}, update);
+            res.status(204).json({
+                status: 'success',
             })
         } catch (error) {
             next(error)
@@ -148,13 +147,6 @@ module.exports = {
                 }).catch(next)
             });
 
-            // Delete post from referenced tags
-            let tags = post.tags;
-            await tags.map(item=>{
-                 Tag.updateOne({'_id': item}, {'$pull': {'posts': req.params.id}}).then(()=>{
-                    console.log('post deleted from tag')
-                }).catch(next)
-            })
 
             // Finally Delete post
             await Post.findByIdAndDelete(req.params.id);
