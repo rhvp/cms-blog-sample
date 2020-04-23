@@ -109,26 +109,37 @@ module.exports = {
             let update = _.pick(req.body, 'title','content', 'image', 'excerpt');
             const post = await Post.findById(req.params.id);
             if(!post) return next(new AppError('Post Not Found', 404));
-            const tags = await req.body.tags.map(tag=>{
-                let id = mongoose.Types.ObjectId(tag);
-                return id;
-            })
-            const category = await req.body.category.map(category=>{
-                let id = mongoose.Types.ObjectId(category);
-                return id;
-            })
+
+            if(req.body.tags) {
+                const tags = await req.body.tags.map(tag=>{
+                    let id = mongoose.Types.ObjectId(tag);
+                    return id;
+                })
+                update.tags = tags;
+            }
             
-            update.tags = tags;
-            update.category = category;
+            if(req.body.category){
+                const category = await req.body.category.map(category=>{
+                    let id = mongoose.Types.ObjectId(category);
+                    return id;
+                })
+                update.category = category;
+            }
+            
+            
+            
+            
             console.log(update);
-           
+            res.status(200).json({
+                data: {update}
+            })
             // post.save(err=>{
             //     if(err) return next(err);
             // })
-            await Post.updateOne({_id: req.params.id}, update);
-            res.status(204).json({
-                status: 'success',
-            })
+            // await Post.updateOne({_id: req.params.id}, update);
+            // res.status(204).json({
+            //     status: 'success',
+            // })
         } catch (error) {
             next(error)
         }
