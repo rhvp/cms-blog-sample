@@ -49,7 +49,8 @@ module.exports = {
                 res.status(200).json({
                     status: 'success',
                     message: 'User logged in.',
-                    data: {user}
+                    data: {user},
+                    token: token
                 })
             } else {
                 return next(new AppError('Password Incorrect', 401));
