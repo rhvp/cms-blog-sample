@@ -126,20 +126,10 @@ module.exports = {
                 update.category = category;
             }
             
-            
-            
-            
-            console.log(update);
-            res.status(200).json({
-                data: {update}
+            await Post.updateOne({_id: req.params.id}, update);
+            res.status(204).json({
+                status: 'success',
             })
-            // post.save(err=>{
-            //     if(err) return next(err);
-            // })
-            // await Post.updateOne({_id: req.params.id}, update);
-            // res.status(204).json({
-            //     status: 'success',
-            // })
         } catch (error) {
             next(error)
         }
