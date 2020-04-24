@@ -7,16 +7,15 @@ const auth = require('../config/authorization');
 
 
 router.get('/',post_Controller.get_Posts)
-    
-router.get('/:id', post_Controller.get_single_Post)
 
 router.get('/drafts',post_Controller.get_Drafts)
 
-router.get('/recents', post_Controller.get_recent_posts)
+router.get('/recent', post_Controller.get_recent_posts)
 
 router.get('/published', post_Controller.get_Published)
 
 router.get('/get-by-category/:id', post_Controller.get_Posts_By_Category)
+router.get('/:id', post_Controller.get_single_Post)
 
 router.route('/comments/:post_id')
     .post(comment_Controller.post_new_comment)

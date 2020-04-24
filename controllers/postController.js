@@ -38,7 +38,7 @@ module.exports = {
     },
 
     get_recent_posts: (req, res, next)=>{
-        Post.find({}).sort({createdAt: -1}).populate('tags category comments').then(posts=>{
+        Post.find({'published': true}).sort({createdAt: -1}).limit(3).populate('tags category comments').then(posts=>{
             res.status(200).json({
                 status: 'success',
                 data: {posts}
