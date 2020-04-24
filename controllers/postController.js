@@ -65,7 +65,7 @@ module.exports = {
 
     get_Posts_By_Category: (req, res, next)=>{
         const cat_id = req.params.id;
-        Post.find({'category':cat_id}).populate('tags category comments').then(posts=>{
+        Post.find({'category':cat_id, 'published': true}).populate('tags category comments').then(posts=>{
             res.status(200).json({
                 status: 'success',
                 data: {posts}
